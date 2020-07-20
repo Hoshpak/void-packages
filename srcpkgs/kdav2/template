@@ -1,0 +1,23 @@
+# Template file for 'kdav2'
+pkgname=kdav2
+version=0.3.0
+revision=1
+build_style=cmake
+configure_args="-DBUILD_TESTING=OFF"
+hostmakedepends="extra-cmake-modules qt5-host-tools qt5-qmake kcoreaddons"
+makedepends="qt5-xmlpatterns-devel kcoreaddons-devel"
+short_desc="DAV protocol implementation with KJobs"
+maintainer="Helmut Pozimski <helmut@pozimski.eu>"
+license="GPL-2.0-or-later"
+homepage="https://kde.org"
+distfiles="https://download.kde.org/unstable/${pkgname}/${version}/src/${pkgname}-${version}.tar.xz"
+checksum=8dd391e67995156d15ad9c7a1e7de89c65e95e59e10c56ff18d43d2e84517063
+
+kdav2-devel_package() {
+	depends="${sourcepkg}>=${version}_${revision}"
+	short_desc+=" - development files"
+	pkg_install() {
+		vmove usr/include
+		vmove usr/lib/cmake
+	}
+}
