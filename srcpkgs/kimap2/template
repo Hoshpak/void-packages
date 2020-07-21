@@ -1,0 +1,23 @@
+# Template file for 'kimap2'
+pkgname=kimap2
+version=0.3.0
+revision=1
+build_style=cmake
+hostmakedepends="extra-cmake-modules qt5-host-tools qt5-qmake kcoreaddons"
+makedepends="kcoreaddons-devel kcodecs-devel kmime-devel libsasl-devel"
+short_desc="Job-based API for interacting with IMAP servers"
+maintainer="Helmut Pozimski <helmut@pozimski.eu>"
+license="LGPL-2.1-or-later, GPL-2.0-or-later"
+homepage="https://kde.org"
+distfiles="https://download.kde.org/unstable/${pkgname}/${version}/src/${pkgname}-${version}.tar.xz"
+checksum=f35b27772036168de9cd18326aa84f0881ed5694fdfa2fe15b8e51bd2b916f2b
+
+kimap2-devel_package() {
+	depends="${sourcepkg}>=${version}_${revision}"
+	short_desc+=" - development files"
+	pkg_install() {
+		vmove usr/include
+		vmove usr/lib/cmake
+		vmove usr/lib/*.so
+	}
+}
