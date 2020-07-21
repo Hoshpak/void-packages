@@ -504,6 +504,7 @@ libKF5GrantleeTheme.so.5 grantleetheme-17.12.3_1
 libKF5IMAP.so.5 kimap-17.12.3_1
 libKF5Ldap.so.5 kldap-17.12.3_1
 libKAsync.so.0 kasync-0.3.0_1
+libsink.so.0 libsink-0.8.0_1
 libKF5CalendarCore.so.5 kcalendarcore-5.63.0_1
 libKF5AkonadiSearchDebug.so.5 akonadi-search-17.12.3_1
 libKF5AkonadiSearchCore.so.5 akonadi-search-17.12.3_1

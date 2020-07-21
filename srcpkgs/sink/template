@@ -1,0 +1,41 @@
+# Template file for 'sink'
+pkgname=sink
+version=0.8.0
+revision=1
+build_style=cmake
+configure_args="-DCMAKE_CXX_FLAGS=-std=c++14"
+hostmakedepends="extra-cmake-modules qt5-qmake qt5-host-tools gettext"
+makedepends="kmime-devel kcontacts-devel kasync-devel flatbuffers-devel
+ lmdb-devel kimap2-devel libsasl-devel libcurl-devel kdav2-devel
+ readline-devel kcalendarcore-devel xapian-core-devel"
+short_desc="Offline-caching, synchronization and indexing system for PIM data"
+maintainer="Helmut Pozimski <helmut@pozimski.eu>"
+license="LGPL-2.1-or-later"
+homepage="https://kde.org"
+distfiles="https://download.kde.org/unstable/${pkgname}/${version}/src/${pkgname}-${version}.tar.xz"
+checksum=d75f825167433d577cf500bfb7a3f664288c7805640859de2f873611a9226ff4
+
+pre_configure() {
+	vsed /c++0x/d -i CMakeLists.txt
+	sed -e "/add_subdirectory(tests)/ s/^/#DONT/" \
+		-i CMakeLists.txt examples/imapresource/CMakeLists.txt \
+		examples/mail{transport,dir}resource/CMakeLists.txt \
+		examples/ca{l,rd}davresource/CMakeLists.txt
+}
+
+libsink_package() {
+	short_desc+=" - library"
+	pkg_install() {
+		vmove "usr/lib/*.so.*"
+	}
+}
+
+libsink-devel_package() {
+	depends="libsink>=${version}_${revision}"
+	short_desc+=" - development files"
+ 	pkg_install() {
+		vmove usr/include
+		vmove "usr/lib/*.so"
+		vmove usr/lib/cmake
+	}
+}
