@@ -1,0 +1,19 @@
+# Template file for 'kube'
+pkgname=kube
+version=0.8.0
+revision=1
+build_style=cmake
+hostmakedepends="extra-cmake-modules qt5-qmake qt5-host-tools gettext"
+makedepends="qt5-declarative-devel qt5-webengine-devel qt5-webchannel-devel
+ qt5-location-devel kmime-devel kcodecs-devel kcalendarcore-devel libsink-devel
+ kasync-devel kcontacts-devel gpgme-devel"
+short_desc="Modern groupware client based on QtQuick and Sink"
+maintainer="Helmut Pozimski <helmut@pozimski.eu>"
+license="GPL-2.0-or-later"
+homepage="https://kde.org"
+distfiles="https://download.kde.org/unstable/${pkgname}/${version}/src/${pkgname}-${version}.tar.xz"
+checksum=2961acf94d528cbf1650cc420add12d5ec2c684d9232043c9d6d2d55b9d39782
+
+pre_configure() {
+	find . -name CMakeLists.txt | xargs sed -e '/tests/d' -i # Don't build tests
+}
