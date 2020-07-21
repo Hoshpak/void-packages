@@ -1,0 +1,23 @@
+# Template file for 'kasync'
+pkgname=kasync
+version=0.3.0
+revision=1
+build_style=cmake
+hostmakedepends="extra-cmake-modules qt5-qmake qt5-host-tools"
+makedepends="qt5-devel"
+short_desc="C++ library for controlling asynchronous tasks"
+maintainer="Helmut Pozimski <helmut@pozimski.eu>"
+license="LGPL-2.1-or-laster, GPL-2.0-or-later"
+homepage="https://kde.org"
+distfiles="https://download.kde.org/unstable/${pkgname}/${version}/src/${pkgname}-${version}.tar.xz"
+checksum=08916f0878f4cac650b89e5bf04c49f1bf1fcd690c58310e4849350ddc6a3b58
+
+kasync-devel_package() {
+	depends="${sourcepkg}>=${version}_${revision}"
+	short_desc+=" - development files"
+	pkg_install() {
+		vmove usr/include
+		vmove usr/lib/cmake
+		vmove usr/lib/*.so
+	}
+}
