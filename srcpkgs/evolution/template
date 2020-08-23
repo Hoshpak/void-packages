@@ -22,6 +22,7 @@ distfiles="${GNOME_SITE}/${pkgname}/${version%.*}/${pkgname}-${version}.tar.xz"
 checksum=f81cc40f54aa2d059da4f3a94eb09362e81513306c974a41ca7895b9c8957c5d
 shlib_provides="libevolution-calendar.so libevolution-util.so libemail-engine.so
  libevolution-mail.so libevolution-shell.so"
+patch_args="-Np1"
 
 build_options="gir"
 if [ -z "$CROSS_BUILD" ]; then
