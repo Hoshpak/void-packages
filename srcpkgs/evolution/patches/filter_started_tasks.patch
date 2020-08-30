@@ -13,42 +13,6 @@ index 81cbaebab3..739f76a562 100644
  #: ../src/modules/addressbook/e-book-shell-view-actions.c:1288
  #: ../src/modules/calendar/e-cal-shell-view-actions.c:1685
  #: ../src/modules/calendar/e-memo-shell-view-actions.c:800
-diff --git a/src/modules/calendar/e-task-shell-view-actions.c b/src/modules/calendar/e-task-shell-view-actions.c
-index e212438609..35329821ec 100644
---- a/src/modules/calendar/e-task-shell-view-actions.c
-+++ b/src/modules/calendar/e-task-shell-view-actions.c
-@@ -1005,7 +1005,14 @@ static GtkRadioActionEntry task_filter_entries[] = {
- 	  N_("Unmatched"),
- 	  NULL,
- 	  NULL,  /* XXX Add a tooltip! */
--	  TASK_FILTER_UNMATCHED }
-+	  TASK_FILTER_UNMATCHED },
-+
-+    { "task-filter-started",
-+      NULL,
-+      N_("Started Tasks"),
-+      NULL,
-+      NULL,  /* XXX Add a tooltip! */
-+      TASK_FILTER_STARTED }
- };
- 
- static GtkRadioActionEntry task_search_entries[] = {
-diff --git a/src/modules/calendar/e-task-shell-view-actions.h b/src/modules/calendar/e-task-shell-view-actions.h
-index b0c9d96766..47593b42c1 100644
---- a/src/modules/calendar/e-task-shell-view-actions.h
-+++ b/src/modules/calendar/e-task-shell-view-actions.h
-@@ -94,6 +94,8 @@
- 	E_SHELL_WINDOW_ACTION ((window), "task-filter-overdue-tasks")
- #define E_SHELL_WINDOW_ACTION_TASK_FILTER_TASKS_WITH_ATTACHMENTS(window) \
- 	E_SHELL_WINDOW_ACTION ((window), "task-filter-tasks-with-attachments")
-+#define E_SHELL_WINDOW_ACTION_TASK_FILTER_TASK_FILTER_STARTED(window) \
-+	E_SHELL_WINDOW_ACTION ((window), "task-filter-started")
- #define E_SHELL_WINDOW_ACTION_TASK_FILTER_UNMATCHED(window) \
- 	E_SHELL_WINDOW_ACTION ((window), "task-filter-unmatched")
- #define E_SHELL_WINDOW_ACTION_TASK_SEARCH_ADVANCED_HIDDEN(window) \
-
-diff --git a/src/modules/calendar/e-task-shell-view.c b/src/modules/calendar/e-task-shell-view.c
-index a8c1966ad5..fb8fb09455 100644
 --- a/src/modules/calendar/e-task-shell-view-private.h	2020-08-23 16:51:35.725885771 +0200
 +++ b/src/modules/calendar/e-task-shell-view-private.h	2020-08-23 16:52:13.575386120 +0200
 @@ -56,9 +56,10 @@
@@ -65,35 +29,59 @@ index a8c1966ad5..fb8fb09455 100644
  	TASK_FILTER_ACTIVE_TASKS = -5,
  	TASK_FILTER_OVERDUE_TASKS = -4,
  	TASK_FILTER_COMPLETED_TASKS = -3,
+diff --git a/src/modules/calendar/e-task-shell-view-actions.c b/src/modules/calendar/e-task-shell-view-actions.c
+index e212438609..a5bf9bc337 100644
+--- a/src/modules/calendar/e-task-shell-view-actions.c
++++ b/src/modules/calendar/e-task-shell-view-actions.c
+@@ -1005,7 +1005,14 @@ static GtkRadioActionEntry task_filter_entries[] = {
+ 	  N_("Unmatched"),
+ 	  NULL,
+ 	  NULL,  /* XXX Add a tooltip! */
+-	  TASK_FILTER_UNMATCHED }
++	  TASK_FILTER_UNMATCHED },
++
++	{ "task-filter-started",
++	  NULL,
++	  N_("Started Tasks"),
++	  NULL,
++	  N_("Filters for tasks that either do not have a start date or a start date earlier than the time the filter is selected at"),
++	  TASK_FILTER_STARTED }
+ };
+ 
+ static GtkRadioActionEntry task_search_entries[] = {
+diff --git a/src/modules/calendar/e-task-shell-view-actions.h b/src/modules/calendar/e-task-shell-view-actions.h
+index b0c9d96766..47593b42c1 100644
+--- a/src/modules/calendar/e-task-shell-view-actions.h
++++ b/src/modules/calendar/e-task-shell-view-actions.h
+@@ -94,6 +94,8 @@
+ 	E_SHELL_WINDOW_ACTION ((window), "task-filter-overdue-tasks")
+ #define E_SHELL_WINDOW_ACTION_TASK_FILTER_TASKS_WITH_ATTACHMENTS(window) \
+ 	E_SHELL_WINDOW_ACTION ((window), "task-filter-tasks-with-attachments")
++#define E_SHELL_WINDOW_ACTION_TASK_FILTER_TASK_FILTER_STARTED(window) \
++	E_SHELL_WINDOW_ACTION ((window), "task-filter-started")
+ #define E_SHELL_WINDOW_ACTION_TASK_FILTER_UNMATCHED(window) \
+ 	E_SHELL_WINDOW_ACTION ((window), "task-filter-unmatched")
+ #define E_SHELL_WINDOW_ACTION_TASK_SEARCH_ADVANCED_HIDDEN(window) \
 diff --git a/src/modules/calendar/e-task-shell-view.c b/src/modules/calendar/e-task-shell-view.c
-index a8c1966ad5..8a15c1bce1 100644
+index a8c1966ad5..e91b8cc204 100644
 --- a/src/modules/calendar/e-task-shell-view.c
 +++ b/src/modules/calendar/e-task-shell-view.c
-@@ -164,7 +164,7 @@ task_shell_view_execute_search (EShellView *shell_view)
- 
- 			temp = g_strdup_printf (
- 				"(and %s (due-in-time-range? "
--				"(make-time \"%s\") (make-time \"%s\")) "
-+				"(make-time \"%s\") (make-time \"%s\")) ",
- 				"(not (is-completed?)))",
- 				query, start, end);
- 			g_free (query);
-@@ -207,6 +207,18 @@ task_shell_view_execute_search (EShellView *shell_view)
+@@ -207,6 +207,15 @@ task_shell_view_execute_search (EShellView *shell_view)
  			query = temp;
  			break;
  
-+        case TASK_FILTER_STARTED:
-+            start_range = now_time;
-+            start = isodate_from_time_t (start_range);
-+            temp = g_strdup_printf (
++		case TASK_FILTER_STARTED:
++			temp = g_strdup_printf (
 +				"(or (and %s (starts-before? "
-+                "(make-time \"%s\"))) "
-+                "(not (has-start?)))",
-+                query, start);
-+            g_free (query);
-+            query = temp;
-+            break;
++				"(time-now))) "
++				"(not (has-start?)))", query);
++			g_free (query);
++			query = temp;
++			break;
 +
  		default:
  		{
  			GList *categories;
+-- 
+2.28.0
+
