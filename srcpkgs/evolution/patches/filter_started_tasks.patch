@@ -13,24 +13,25 @@ index 81cbaebab3..739f76a562 100644
  #: ../src/modules/addressbook/e-book-shell-view-actions.c:1288
  #: ../src/modules/calendar/e-cal-shell-view-actions.c:1685
  #: ../src/modules/calendar/e-memo-shell-view-actions.c:800
---- a/src/modules/calendar/e-task-shell-view-private.h	2020-08-23 16:51:35.725885771 +0200
-+++ b/src/modules/calendar/e-task-shell-view-private.h	2020-08-23 16:52:13.575386120 +0200
-@@ -56,9 +56,10 @@
- /* Filter items are displayed in ascending order.
-  * Non-negative values are reserved for categories. */
- enum {
--	TASK_FILTER_ANY_CATEGORY = -8,
--	TASK_FILTER_UNMATCHED = -7,
--	TASK_FILTER_NEXT_7_DAYS_TASKS = -6,
-+	TASK_FILTER_ANY_CATEGORY = -9,
-+	TASK_FILTER_UNMATCHED = -8,
-+	TASK_FILTER_NEXT_7_DAYS_TASKS = -7,
-+	TASK_FILTER_STARTED = -6,
- 	TASK_FILTER_ACTIVE_TASKS = -5,
- 	TASK_FILTER_OVERDUE_TASKS = -4,
- 	TASK_FILTER_COMPLETED_TASKS = -3,
+From f895ea667f00bb36d2ef9f8165fb09ccca700f1f Mon Sep 17 00:00:00 2001
+From: Helmut Pozimski <helmut@pozimski.eu>
+Date: Thu, 27 Aug 2020 20:28:54 +0200
+Subject: [PATCH] M!63 - Tasks: Add a filter option to show started tasks
+
+Allows to filter for tasks that either have a start date before the
+current time or do not have one to support workflows that rely on
+the start date of a task rather than completion status or due date.
+
+Closes https://gitlab.gnome.org/GNOME/evolution/-/merge_requests/63
+---
+ src/modules/calendar/e-task-shell-view-actions.c | 9 ++++++++-
+ src/modules/calendar/e-task-shell-view-actions.h | 2 ++
+ src/modules/calendar/e-task-shell-view-private.h | 9 +++++----
+ src/modules/calendar/e-task-shell-view.c         | 9 +++++++++
+ 4 files changed, 24 insertions(+), 5 deletions(-)
+
 diff --git a/src/modules/calendar/e-task-shell-view-actions.c b/src/modules/calendar/e-task-shell-view-actions.c
-index e212438609..a5bf9bc337 100644
+index e212438609..17d8c7abe9 100644
 --- a/src/modules/calendar/e-task-shell-view-actions.c
 +++ b/src/modules/calendar/e-task-shell-view-actions.c
 @@ -1005,7 +1005,14 @@ static GtkRadioActionEntry task_filter_entries[] = {
@@ -44,7 +45,7 @@ index e212438609..a5bf9bc337 100644
 +	  NULL,
 +	  N_("Started Tasks"),
 +	  NULL,
-+	  N_("Filters for tasks that either do not have a start date or a start date earlier than the time the filter is selected at"),
++	  N_("Filters for tasks that either do not have a start date or the start date is earlier than the time the filter is selected at"),
 +	  TASK_FILTER_STARTED }
  };
  
@@ -62,6 +63,26 @@ index b0c9d96766..47593b42c1 100644
  #define E_SHELL_WINDOW_ACTION_TASK_FILTER_UNMATCHED(window) \
  	E_SHELL_WINDOW_ACTION ((window), "task-filter-unmatched")
  #define E_SHELL_WINDOW_ACTION_TASK_SEARCH_ADVANCED_HIDDEN(window) \
+diff --git a/src/modules/calendar/e-task-shell-view-private.h b/src/modules/calendar/e-task-shell-view-private.h
+index 3e385cd3af..c1ffe8f82c 100644
+--- a/src/modules/calendar/e-task-shell-view-private.h
++++ b/src/modules/calendar/e-task-shell-view-private.h
+@@ -56,10 +56,11 @@ G_BEGIN_DECLS
+ /* Filter items are displayed in ascending order.
+  * Non-negative values are reserved for categories. */
+ enum {
+-	TASK_FILTER_ANY_CATEGORY = -9,
+-	TASK_FILTER_UNMATCHED = -8,
+-	TASK_FILTER_UNCOMPLETED_TASKS = -7,
+-	TASK_FILTER_NEXT_7_DAYS_TASKS = -6,
++	TASK_FILTER_ANY_CATEGORY = -10,
++	TASK_FILTER_UNMATCHED = -9,
++	TASK_FILTER_UNCOMPLETED_TASKS = -8,
++	TASK_FILTER_NEXT_7_DAYS_TASKS = -7,
++	TASK_FILTER_STARTED = -6,
+ 	TASK_FILTER_ACTIVE_TASKS = -5,
+ 	TASK_FILTER_OVERDUE_TASKS = -4,
+ 	TASK_FILTER_COMPLETED_TASKS = -3,
 diff --git a/src/modules/calendar/e-task-shell-view.c b/src/modules/calendar/e-task-shell-view.c
 index a8c1966ad5..e91b8cc204 100644
 --- a/src/modules/calendar/e-task-shell-view.c
@@ -83,5 +104,4 @@ index a8c1966ad5..e91b8cc204 100644
  		{
  			GList *categories;
 -- 
-2.28.0
-
+GitLab
